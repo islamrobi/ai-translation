@@ -195,9 +195,11 @@ function parseModelJson(raw, fallbackText) {
 
 async function callGemini(prompt, settings) {
   const model = settings.model || DEFAULT_MODELS.gemini;
+  // Send the key both ways (query param + header) for maximum compatibility
+  // across key types and endpoint versions.
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
     model
-  )}:generateContent`;
+  )}:generateContent?key=${encodeURIComponent(settings.apiKey)}`;
 
   const body = {
     contents: [{ parts: [{ text: prompt }] }],
@@ -210,9 +212,6 @@ async function callGemini(prompt, settings) {
 
   const res = await fetch(url, {
     method: "POST",
-    // Pass the API key via the x-goog-api-key header (the currently documented
-    // method). The ?key= query param can trigger "invalid authentication
-    // credentials" errors on some keys/endpoints.
     headers: {
       "Content-Type": "application/json",
       "x-goog-api-key": settings.apiKey,
@@ -294,7 +293,16 @@ async function readJsonOrThrow(res, providerName) {
   if (!res.ok) {
     const apiMsg =
       data?.error?.message || data?.error || data?.message || `HTTP ${res.status}`;
-    throw new Error(`${providerName} error: ${apiMsg}`);
+    let hint = "";
+    if (res.status === 401 || res.status === 403) {
+      if (providerName === "Gemini") {
+        hint =
+          " — Make sure you pasted a Gemini API key from Google AI Studio (aistudio.google.com → 'Get API key'), not a Google Cloud OAuth client ID or a service-account credential. Also confirm the 'Generative Language API' is enabled and the key has no HTTP-referrer/IP restrictions.";
+      } else {
+        hint = " — Check that the API key is correct and has not expired or been restricted.";
+      }
+    }
+    throw new Error(`${providerName} error: ${apiMsg}${hint}`);
   }
   return data;
 }
