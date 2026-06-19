@@ -81,11 +81,16 @@ In the developer console, create a new item, upload the ZIP, then complete:
 
 - **Category:** Productivity (or Education).
 - **Language:** English.
-- **Privacy policy URL:** required. Host `PRIVACY.md` somewhere public and paste
-  the URL. Easiest options:
-  - Enable **GitHub Pages** for the repo and link the rendered page, or
-  - Link the raw file, e.g.
-    `https://raw.githubusercontent.com/<owner>/<repo>/main/PRIVACY.md`.
+- **Privacy policy URL:** required and must be publicly reachable. A ready-made
+  HTML policy is at `docs/privacy.html`. Recommended hosting via **GitHub Pages**:
+  1. Merge the policy to the `main` branch.
+  2. In the GitHub repo: **Settings → Pages → Build and deployment → Source:
+     "Deploy from a branch"**, branch **`main`**, folder **`/docs`**, then Save.
+  3. After it builds, your privacy policy URL will be:
+     `https://islamrobi.github.io/ai-translation/privacy.html`
+  Paste that URL into the store listing.
+  Alternative (no Pages): once `PRIVACY.md` is on `main`, you can link the rendered
+  file at `https://github.com/islamrobi/ai-translation/blob/main/PRIVACY.md`.
 
 ## 5. Privacy & data-use disclosures (required)
 
