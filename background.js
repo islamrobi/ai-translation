@@ -197,7 +197,7 @@ async function callGemini(prompt, settings) {
   const model = settings.model || DEFAULT_MODELS.gemini;
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
     model
-  )}:generateContent?key=${encodeURIComponent(settings.apiKey)}`;
+  )}:generateContent`;
 
   const body = {
     contents: [{ parts: [{ text: prompt }] }],
@@ -210,7 +210,13 @@ async function callGemini(prompt, settings) {
 
   const res = await fetch(url, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    // Pass the API key via the x-goog-api-key header (the currently documented
+    // method). The ?key= query param can trigger "invalid authentication
+    // credentials" errors on some keys/endpoints.
+    headers: {
+      "Content-Type": "application/json",
+      "x-goog-api-key": settings.apiKey,
+    },
     body: JSON.stringify(body),
   });
 
