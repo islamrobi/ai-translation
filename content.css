@@ -42,11 +42,21 @@
 }
 
 .h2r-tooltip .h2r-brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   font-size: 12px;
   font-weight: 700;
   letter-spacing: 0.3px;
   color: #ffffff;
   text-transform: uppercase;
+}
+
+.h2r-tooltip .h2r-spark {
+  width: 14px;
+  height: 14px;
+  flex: 0 0 auto;
+  color: #ffffff;
 }
 
 .h2r-tooltip .h2r-close {

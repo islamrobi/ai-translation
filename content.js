@@ -77,10 +77,18 @@
       .replace(/'/g, "&#39;");
   }
 
+  var SPARK_SVG =
+    '<svg class="h2r-spark" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' +
+    '<path d="M10 1.5 L11.9 8.1 L18.5 10 L11.9 11.9 L10 18.5 L8.1 11.9 L1.5 10 L8.1 8.1 Z"/>' +
+    '<path d="M18.5 14.5 L19.42 17.58 L22.5 18.5 L19.42 19.42 L18.5 22.5 L17.58 19.42 L14.5 18.5 L17.58 17.58 Z"/>' +
+    "</svg>";
+
   function headerHtml(modeLabel) {
     return `
       <div class="h2r-header">
-        <span class="h2r-brand">H2R · ${escapeHtml(modeLabel)}</span>
+        <span class="h2r-brand">${SPARK_SVG}<span>AI Translate · ${escapeHtml(
+      modeLabel
+    )}</span></span>
         <button class="h2r-close" type="button" aria-label="Close">×</button>
       </div>`;
   }

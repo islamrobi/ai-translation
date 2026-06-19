@@ -24,11 +24,14 @@
         border-radius: 9px;
         background: linear-gradient(135deg, #4f46e5, #7c3aed);
         color: #fff;
-        font-weight: 800;
-        font-size: 13px;
         display: flex;
         align-items: center;
         justify-content: center;
+      }
+      .logo svg {
+        width: 60%;
+        height: 60%;
+        display: block;
       }
       h1 {
         font-size: 15px;
@@ -72,7 +75,12 @@
   </head>
   <body>
     <div class="row">
-      <div class="logo">H2R</div>
+      <div class="logo">
+        <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path d="M10 1.5 L11.9 8.1 L18.5 10 L11.9 11.9 L10 18.5 L8.1 11.9 L1.5 10 L8.1 8.1 Z" />
+          <path d="M18.5 14.5 L19.42 17.58 L22.5 18.5 L19.42 19.42 L18.5 22.5 L17.58 19.42 L14.5 18.5 L17.58 17.58 Z" />
+        </svg>
+      </div>
       <h1>AI Translate</h1>
     </div>
     <p>Select text on a page, right-click, and choose <strong>“AI Translate (E2B)”</strong> to see the Bengali translation.</p>
