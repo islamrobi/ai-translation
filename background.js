@@ -1,0 +1,277 @@
+// H2R - Translate :: background service worker
+// Creates context menus, calls the configured AI provider, and pushes the
+// result down to the content script which renders it inside a tooltip.
+
+const MENU_TRANSLATE = "h2r-translate";
+const MENU_LOOKUP = "h2r-lookup";
+
+const DEFAULT_MODELS = {
+  gemini: "gemini-2.0-flash",
+  openai: "gpt-4o-mini",
+  claude: "claude-3-5-haiku-latest",
+};
+
+function buildContextMenus() {
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: MENU_TRANSLATE,
+      title: "H2R - Translate",
+      contexts: ["selection"],
+    });
+    chrome.contextMenus.create({
+      id: MENU_LOOKUP,
+      title: "H2R - Lookup",
+      contexts: ["selection"],
+    });
+  });
+}
+
+chrome.runtime.onInstalled.addListener(buildContextMenus);
+chrome.runtime.onStartup.addListener(buildContextMenus);
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  if (!tab || tab.id == null) return;
+  const text = (info.selectionText || "").trim();
+  if (!text) return;
+
+  const mode = info.menuItemId === MENU_LOOKUP ? "lookup" : "translate";
+  handleRequest(tab.id, text, mode);
+});
+
+// Allow the content script (e.g. a re-try button) to ask for a translation too.
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (!message) return false;
+  if (message.type === "h2r-request" && sender.tab && sender.tab.id != null) {
+    handleRequest(sender.tab.id, message.text, message.mode || "translate");
+  } else if (message.type === "h2r-open-options") {
+    chrome.runtime.openOptionsPage();
+  }
+  return false;
+});
+
+async function handleRequest(tabId, text, mode) {
+  sendToTab(tabId, { type: "h2r-loading", text, mode });
+
+  try {
+    const settings = await getSettings();
+    if (!settings.apiKey) {
+      sendToTab(tabId, {
+        type: "h2r-error",
+        text,
+        mode,
+        error: "No API key configured. Open the H2R - Translate settings to add one.",
+        needsSettings: true,
+      });
+      return;
+    }
+
+    const result = await translateWithAI(text, mode, settings);
+    sendToTab(tabId, { type: "h2r-result", text, mode, result });
+  } catch (err) {
+    sendToTab(tabId, {
+      type: "h2r-error",
+      text,
+      mode,
+      error: (err && err.message) || String(err),
+    });
+  }
+}
+
+function sendToTab(tabId, payload) {
+  chrome.tabs.sendMessage(tabId, payload).catch(() => {
+    // Content script may not be injected on this page (e.g. chrome:// pages).
+  });
+}
+
+function getSettings() {
+  return new Promise((resolve) => {
+    chrome.storage.sync.get(
+      { provider: "gemini", apiKey: "", model: "" },
+      (items) => {
+        const provider = items.provider || "gemini";
+        resolve({
+          provider,
+          apiKey: (items.apiKey || "").trim(),
+          model: (items.model || "").trim() || DEFAULT_MODELS[provider],
+        });
+      }
+    );
+  });
+}
+
+function buildPrompt(text, mode) {
+  const intro =
+    mode === "lookup"
+      ? `You are an English-to-Bengali dictionary and language tutor. The user looked up the following English word or phrase:`
+      : `You are an expert English-to-Bengali translator and language tutor. Translate the following English text to Bengali:`;
+
+  return `${intro}
+
+"""${text}"""
+
+Respond ONLY with a single minified JSON object (no markdown, no code fences) using exactly this shape:
+{
+  "bengali": "the natural Bengali translation",
+  "transliteration": "romanized/phonetic Bengali pronunciation",
+  "english_meaning": "a concise explanation of the meaning in English",
+  "part_of_speech": "the part of speech if it is a single word, otherwise an empty string",
+  "examples": [
+    { "english": "an English example sentence", "bengali": "its Bengali translation" },
+    { "english": "another English example sentence", "bengali": "its Bengali translation" }
+  ]
+}
+
+Provide 2 to 3 examples. Keep the JSON valid and do not add any extra keys or text.`;
+}
+
+async function translateWithAI(text, mode, settings) {
+  const prompt = buildPrompt(text, mode);
+  let raw;
+
+  if (settings.provider === "gemini") {
+    raw = await callGemini(prompt, settings);
+  } else if (settings.provider === "openai") {
+    raw = await callOpenAI(prompt, settings);
+  } else if (settings.provider === "claude") {
+    raw = await callClaude(prompt, settings);
+  } else {
+    throw new Error(`Unknown provider: ${settings.provider}`);
+  }
+
+  return parseModelJson(raw, text);
+}
+
+function parseModelJson(raw, fallbackText) {
+  if (!raw) {
+    throw new Error("The AI returned an empty response.");
+  }
+  let cleaned = raw.trim();
+  // Strip markdown code fences if the model added them anyway.
+  cleaned = cleaned.replace(/^```(?:json)?/i, "").replace(/```$/i, "").trim();
+
+  // Grab the first balanced-looking JSON object.
+  const start = cleaned.indexOf("{");
+  const end = cleaned.lastIndexOf("}");
+  if (start !== -1 && end !== -1 && end > start) {
+    cleaned = cleaned.slice(start, end + 1);
+  }
+
+  try {
+    const parsed = JSON.parse(cleaned);
+    return {
+      bengali: parsed.bengali || "",
+      transliteration: parsed.transliteration || "",
+      english_meaning: parsed.english_meaning || "",
+      part_of_speech: parsed.part_of_speech || "",
+      examples: Array.isArray(parsed.examples) ? parsed.examples : [],
+    };
+  } catch (e) {
+    // If parsing fails, show whatever text we got so the user is not stuck.
+    return {
+      bengali: raw.trim(),
+      transliteration: "",
+      english_meaning: "",
+      part_of_speech: "",
+      examples: [],
+    };
+  }
+}
+
+async function callGemini(prompt, settings) {
+  const model = settings.model || DEFAULT_MODELS.gemini;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
+    model
+  )}:generateContent?key=${encodeURIComponent(settings.apiKey)}`;
+
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature: 0.2,
+      responseMimeType: "application/json",
+    },
+  };
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+  });
+
+  const data = await readJsonOrThrow(res, "Gemini");
+  const parts = data?.candidates?.[0]?.content?.parts;
+  const textOut = Array.isArray(parts) ? parts.map((p) => p.text || "").join("") : "";
+  if (!textOut) throw new Error("Gemini returned no text. Check your API key and model name.");
+  return textOut;
+}
+
+async function callOpenAI(prompt, settings) {
+  const model = settings.model || DEFAULT_MODELS.openai;
+  const res = await fetch("https://api.openai.com/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${settings.apiKey}`,
+    },
+    body: JSON.stringify({
+      model,
+      temperature: 0.2,
+      response_format: { type: "json_object" },
+      messages: [
+        {
+          role: "system",
+          content: "You are a helpful English-to-Bengali translation assistant that always replies with valid JSON.",
+        },
+        { role: "user", content: prompt },
+      ],
+    }),
+  });
+
+  const data = await readJsonOrThrow(res, "OpenAI");
+  const textOut = data?.choices?.[0]?.message?.content || "";
+  if (!textOut) throw new Error("OpenAI returned no text. Check your API key and model name.");
+  return textOut;
+}
+
+async function callClaude(prompt, settings) {
+  const model = settings.model || DEFAULT_MODELS.claude;
+  const res = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "x-api-key": settings.apiKey,
+      "anthropic-version": "2023-06-01",
+      "anthropic-dangerous-direct-browser-access": "true",
+    },
+    body: JSON.stringify({
+      model,
+      max_tokens: 1024,
+      temperature: 0.2,
+      messages: [{ role: "user", content: prompt }],
+    }),
+  });
+
+  const data = await readJsonOrThrow(res, "Claude");
+  const textOut = Array.isArray(data?.content)
+    ? data.content.map((c) => c.text || "").join("")
+    : "";
+  if (!textOut) throw new Error("Claude returned no text. Check your API key and model name.");
+  return textOut;
+}
+
+async function readJsonOrThrow(res, providerName) {
+  let data;
+  try {
+    data = await res.json();
+  } catch (e) {
+    if (!res.ok) {
+      throw new Error(`${providerName} request failed (HTTP ${res.status}).`);
+    }
+    throw new Error(`${providerName} returned an invalid response.`);
+  }
+  if (!res.ok) {
+    const apiMsg =
+      data?.error?.message || data?.error || data?.message || `HTTP ${res.status}`;
+    throw new Error(`${providerName} error: ${apiMsg}`);
+  }
+  return data;
+}
