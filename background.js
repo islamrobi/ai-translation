@@ -66,6 +66,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 async function handleRequest(tabId, text, mode) {
+  // Make sure the tooltip code is present in this tab. Tabs that were already
+  // open when the extension was installed/reloaded won't have the content
+  // script, so inject it on demand before sending any messages.
+  await ensureContentScript(tabId);
+
   sendToTab(tabId, { type: "h2r-loading", text, mode });
 
   try {
@@ -97,6 +102,24 @@ function sendToTab(tabId, payload) {
   chrome.tabs.sendMessage(tabId, payload).catch(() => {
     // Content script may not be injected on this page (e.g. chrome:// pages).
   });
+}
+
+async function ensureContentScript(tabId) {
+  // If the content script is already running it will answer a ping.
+  try {
+    await chrome.tabs.sendMessage(tabId, { type: "h2r-ping" });
+    return true;
+  } catch (e) {
+    // Not injected yet — fall through and inject it.
+  }
+  try {
+    await chrome.scripting.insertCSS({ target: { tabId }, files: ["content.css"] });
+    await chrome.scripting.executeScript({ target: { tabId }, files: ["content.js"] });
+    return true;
+  } catch (e) {
+    // Restricted page (chrome://, Web Store, PDF viewer, etc.) — cannot inject.
+    return false;
+  }
 }
 
 function getSettings() {

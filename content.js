@@ -211,9 +211,12 @@
     if (e.key === "Escape") hideTooltip();
   });
 
-  chrome.runtime.onMessage.addListener((message) => {
+  chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (!message || !message.type) return;
     switch (message.type) {
+      case "h2r-ping":
+        sendResponse({ ok: true });
+        return;
       case "h2r-loading":
         showLoading(message.text, message.mode);
         break;
