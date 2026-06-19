@@ -7,7 +7,7 @@ const MENU_LOOKUP = "h2r-lookup";
 
 const DEFAULT_MODELS = {
   gemini: "gemini-2.5-flash-lite",
-  openai: "gpt-4o-mini",
+  openai: "gpt-5-nano",
   claude: "claude-3-5-haiku-latest",
 };
 

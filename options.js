@@ -2,7 +2,7 @@
 
 const DEFAULT_MODELS = {
   gemini: "gemini-2.5-flash-lite",
-  openai: "gpt-4o-mini",
+  openai: "gpt-5-nano",
   claude: "claude-3-5-haiku-latest",
 };
 
@@ -10,7 +10,7 @@ const PROVIDER_HINTS = {
   gemini:
     'Create a free key at Google AI Studio (aistudio.google.com). Default model: "gemini-2.5-flash-lite" (cheapest; has a free tier).',
   openai:
-    'Create a key at platform.openai.com → API keys. Default model: "gpt-4o-mini".',
+    'Create a key at platform.openai.com → API keys (no free tier). Default model: "gpt-5-nano" (cheapest).',
   claude:
     'Create a key at console.anthropic.com → API keys. Default model: "claude-3-5-haiku-latest".',
 };
