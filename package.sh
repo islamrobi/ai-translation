@@ -16,7 +16,7 @@ fi
 
 VERSION="$(python3 -c "import json;print(json.load(open('manifest.json'))['version'])")"
 OUT_DIR="dist"
-OUT_ZIP="${OUT_DIR}/h2r-translate-v${VERSION}.zip"
+OUT_ZIP="${OUT_DIR}/ai-translate-english-to-bangla-v${VERSION}.zip"
 
 # Runtime files that must ship in the extension package.
 FILES=(

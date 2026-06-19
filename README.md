@@ -1,6 +1,6 @@
-# H2R - Translate
+# AI Translate - English to Bangla
 
-A Chrome (Manifest V3) extension that translates **English → Bengali** using an AI
+A Chrome (Manifest V3) extension that translates **English → Bengali (Bangla)** using an AI
 model of your choice (Google Gemini, OpenAI / ChatGPT, or Anthropic Claude).
 
 Select any word or sentence on a web page, right-click, and pick **“H2R - Translate”**
@@ -106,8 +106,9 @@ A working key returns a JSON response with `candidates`; a broken key returns th
 
 ## Publishing to the Chrome Web Store
 
-Run `./package.sh` to build a clean upload ZIP at `dist/h2r-translate-v<version>.zip`,
-then follow [`PUBLISHING.md`](PUBLISHING.md) for the full submission steps. The
+Run `./package.sh` to build a clean upload ZIP at
+`dist/ai-translate-english-to-bangla-v<version>.zip`, then follow
+[`PUBLISHING.md`](PUBLISHING.md) for the full submission steps. The
 extension's privacy policy is in [`PRIVACY.md`](PRIVACY.md) (host it publicly and
 provide the URL in the store listing).
 

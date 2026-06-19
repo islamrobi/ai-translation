@@ -1,4 +1,9 @@
-# Publishing H2R - Translate to the Chrome Web Store
+# Publishing AI Translate - English to Bangla to the Chrome Web Store
+
+> **Publisher / contact:** Robiul Islam Robi — hello2robi@gmail.com
+> Use this name and email for the developer account, the listing's support
+> contact, and the privacy policy contact.
+
 
 This guide walks through submitting the extension to the Chrome Web Store. The
 code in this repo is already store-ready (Manifest V3, valid icons, a compliant
@@ -21,8 +26,8 @@ From the repo root, run:
 ```
 
 This regenerates the icons and produces a clean ZIP at
-`dist/h2r-translate-v<version>.zip` containing only the runtime files (no docs,
-git, or build scripts). Upload **this ZIP** to the store.
+`dist/ai-translate-english-to-bangla-v<version>.zip` containing only the runtime
+files (no docs, git, or build scripts). Upload **this ZIP** to the store.
 
 > Bump the `version` in `manifest.json` before every new upload — the store
 > rejects a package whose version is not higher than the currently published one.
@@ -47,13 +52,13 @@ The Web Store requires a few images. You provide:
 
 In the developer console, create a new item, upload the ZIP, then complete:
 
-- **Name:** `H2R - Translate`
+- **Name:** `AI Translate - English to Bangla`
 - **Summary / short description (≤132 chars):**
   `Translate English to Bengali with AI. Select text, right-click, and see the Bengali translation, meaning, and examples.`
 - **Detailed description** (suggested):
 
   ```
-  H2R - Translate turns any web page into an English→Bengali learning tool.
+  AI Translate - English to Bangla turns any web page into an English→Bangla learning tool.
 
   Select a word or sentence, right-click, and choose "H2R - Translate" or
   "H2R - Lookup". A tooltip instantly shows:

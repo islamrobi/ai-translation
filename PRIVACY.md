@@ -1,8 +1,8 @@
-# Privacy Policy — H2R - Translate
+# Privacy Policy — AI Translate - English to Bangla
 
 _Last updated: June 19, 2026_
 
-H2R - Translate ("the extension") is a browser extension that translates English
+AI Translate - English to Bangla ("the extension") is a browser extension that translates English
 text to Bengali using an AI provider that you choose and configure with your own
 API key. This policy explains what data the extension handles and how.
 
@@ -73,5 +73,9 @@ repository with a new "Last updated" date.
 
 ## Contact
 
-For questions about this policy, open an issue in the extension's source
-repository.
+For questions about this policy or the extension, contact:
+
+- **Robiul Islam Robi**
+- Email: hello2robi@gmail.com
+
+You can also open an issue in the extension's source repository.

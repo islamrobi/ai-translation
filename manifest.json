@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "H2R - Translate",
+  "name": "AI Translate - English to Bangla",
   "version": "1.0.0",
   "description": "Translate English to Bengali with AI. Select text, right-click, and see the Bengali translation, meaning, and examples.",
   "permissions": ["contextMenus", "storage", "scripting", "activeTab"],
@@ -17,7 +17,7 @@
     "open_in_tab": true
   },
   "action": {
-    "default_title": "H2R - Translate settings",
+    "default_title": "AI Translate - English to Bangla",
     "default_popup": "popup.html",
     "default_icon": {
       "16": "icons/icon16.png",
