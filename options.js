@@ -1,14 +1,14 @@
 // H2R - Translate :: options/settings page logic.
 
 const DEFAULT_MODELS = {
-  gemini: "gemini-2.0-flash",
+  gemini: "gemini-3.5-flash",
   openai: "gpt-4o-mini",
   claude: "claude-3-5-haiku-latest",
 };
 
 const PROVIDER_HINTS = {
   gemini:
-    'Create a free key at Google AI Studio (aistudio.google.com). Default model: "gemini-2.0-flash".',
+    'Create a free key at Google AI Studio (aistudio.google.com). Default model: "gemini-3.5-flash".',
   openai:
     'Create a key at platform.openai.com → API keys. Default model: "gpt-4o-mini".',
   claude:
