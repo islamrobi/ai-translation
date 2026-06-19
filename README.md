@@ -104,6 +104,13 @@ curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:g
 A working key returns a JSON response with `candidates`; a broken key returns the
 401 `UNAUTHENTICATED` error.
 
+## Publishing to the Chrome Web Store
+
+Run `./package.sh` to build a clean upload ZIP at `dist/h2r-translate-v<version>.zip`,
+then follow [`PUBLISHING.md`](PUBLISHING.md) for the full submission steps. The
+extension's privacy policy is in [`PRIVACY.md`](PRIVACY.md) (host it publicly and
+provide the URL in the store listing).
+
 ## Notes
 
 - Claude requests are sent with the `anthropic-dangerous-direct-browser-access` header,
