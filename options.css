@@ -46,11 +46,15 @@ body {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-weight: 800;
-  font-size: 18px;
   color: #fff;
   background: linear-gradient(135deg, #4f46e5, #7c3aed);
   border-radius: 14px;
+}
+
+.logo svg {
+  width: 58%;
+  height: 58%;
+  display: block;
 }
 
 h1 {

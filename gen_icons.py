@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Generate H2R - Translate PNG icons without external deps.
+"""Generate AI Translate - English to Bangla PNG icons without external deps.
 
-Draws a rounded indigo->purple gradient tile with a stylized white speech
-bubble + translate glyph. Pure stdlib (zlib + struct).
+Draws a rounded indigo->purple gradient tile with a white AI "sparkle" glyph
+(a large 4-point star plus a small accent star) indicating AI + technology.
+Pure stdlib (zlib + struct).
 """
 import os
 import struct
@@ -36,13 +37,41 @@ def rounded_alpha(x, y, size, radius):
     return int(255 * (radius - dist))
 
 
+def in_sparkle(px, py, cx, cy, radius, exp=0.62):
+    # A 4-point "sparkle" (astroid-style) star: concave sides, sharp cusps on the
+    # axes. |dx|^exp + |dy|^exp <= radius^exp with exp < 1 gives the AI-sparkle look.
+    if radius <= 0:
+        return False
+    dx = abs(px - cx)
+    dy = abs(py - cy)
+    return (dx ** exp + dy ** exp) <= (radius ** exp)
+
+
+def sparkle_coverage(tx, ty, sparkles, samples=3):
+    # Supersample for smooth (anti-aliased) sparkle edges.
+    hits = 0
+    total = samples * samples
+    step = 1.0 / samples
+    base = -0.5 + step / 2.0
+    for sy in range(samples):
+        oy = base + sy * step
+        for sx in range(samples):
+            ox = base + sx * step
+            for (cx, cy, r) in sparkles:
+                if in_sparkle(tx + ox, ty + oy, cx, cy, r):
+                    hits += 1
+                    break
+    return hits / total
+
+
 def make_icon(size):
     radius = max(2, int(size * 0.22))
-    # Speech-bubble rectangle area (white) within the tile.
-    pad = size * 0.22
-    bx0, by0 = pad, pad
-    bx1, by1 = size - pad, size - pad * 1.15
-    br = max(1.0, size * 0.10)
+
+    # AI sparkle: a large 4-point star slightly upper-left, plus a small accent
+    # star at the lower-right (the familiar "AI" multi-sparkle), in white.
+    main = (size * 0.43, size * 0.43, size * 0.30)
+    accent = (size * 0.72, size * 0.72, size * 0.13)
+    sparkles = [main, accent]
 
     pixels = bytearray()
     for y in range(size):
@@ -51,31 +80,13 @@ def make_icon(size):
             r, g, b = gradient_color(x, y, size)
             a = rounded_alpha(x, y, size, radius)
 
-            inside = False
             tx, ty = x + 0.5, y + 0.5
-            if bx0 <= tx <= bx1 and by0 <= ty <= by1:
-                # rounded corners of the bubble
-                ccx = min(max(tx, bx0 + br), bx1 - br)
-                ccy = min(max(ty, by0 + br), by1 - br)
-                if ((tx - ccx) ** 2 + (ty - ccy) ** 2) ** 0.5 <= br:
-                    inside = True
-
-            # little tail at bottom-left of the bubble
-            tail = False
-            tlx = bx0 + (bx1 - bx0) * 0.30
-            if by1 - 0.5 <= ty <= by1 + size * 0.12:
-                half = (size * 0.12) - (ty - by1)
-                if tlx - half <= tx <= tlx + max(0.0, half):
-                    tail = True
-
-            if inside or tail:
-                r, g, b = 0xFF, 0xFF, 0xFF
-                # draw two indigo "translate" bars inside the bubble
-                rel_y = (ty - by0) / max(1.0, (by1 - by0))
-                if 0.32 <= rel_y <= 0.46 and bx0 + br <= tx <= bx1 - br:
-                    r, g, b = 0x4F, 0x46, 0xE5
-                if 0.58 <= rel_y <= 0.72 and bx0 + br <= tx <= (bx0 + (bx1 - bx0) * 0.72):
-                    r, g, b = 0x7C, 0x3A, 0xED
+            cov = sparkle_coverage(tx, ty, sparkles)
+            if cov > 0:
+                # Blend white sparkle over the gradient by coverage.
+                r = int(lerp(r, 0xFF, cov))
+                g = int(lerp(g, 0xFF, cov))
+                b = int(lerp(b, 0xFF, cov))
 
             pixels.extend((r, g, b, a))
     return bytes(pixels)

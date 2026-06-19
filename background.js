@@ -3,7 +3,6 @@
 // result down to the content script which renders it inside a tooltip.
 
 const MENU_TRANSLATE = "h2r-translate";
-const MENU_LOOKUP = "h2r-lookup";
 
 const DEFAULT_MODELS = {
   gemini: "gemini-2.5-flash-lite",
@@ -15,12 +14,7 @@ function buildContextMenus() {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
       id: MENU_TRANSLATE,
-      title: "H2R - Translate",
-      contexts: ["selection"],
-    });
-    chrome.contextMenus.create({
-      id: MENU_LOOKUP,
-      title: "H2R - Lookup",
+      title: "AI Translate (E2B)",
       contexts: ["selection"],
     });
   });
@@ -47,11 +41,11 @@ chrome.runtime.onStartup.addListener(buildContextMenus);
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (!tab || tab.id == null) return;
+  if (info.menuItemId !== MENU_TRANSLATE) return;
   const text = (info.selectionText || "").trim();
   if (!text) return;
 
-  const mode = info.menuItemId === MENU_LOOKUP ? "lookup" : "translate";
-  handleRequest(tab.id, text, mode);
+  handleRequest(tab.id, text, "translate");
 });
 
 // Allow the content script (e.g. a re-try button) to ask for a translation too.
@@ -80,7 +74,7 @@ async function handleRequest(tabId, text, mode) {
         type: "h2r-error",
         text,
         mode,
-        error: "No API key configured. Open the H2R - Translate settings to add one.",
+        error: "No API key configured. Open the AI Translate settings to add one.",
         needsSettings: true,
       });
       return;

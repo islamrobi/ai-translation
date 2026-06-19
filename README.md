@@ -1,10 +1,10 @@
-# H2R - Translate
+# AI Translate - English to Bangla
 
-A Chrome (Manifest V3) extension that translates **English → Bengali** using an AI
+A Chrome (Manifest V3) extension that translates **English → Bengali (Bangla)** using an AI
 model of your choice (Google Gemini, OpenAI / ChatGPT, or Anthropic Claude).
 
-Select any word or sentence on a web page, right-click, and pick **“H2R - Translate”**
-or **“H2R - Lookup”**. A tooltip appears showing:
+Select any word or sentence on a web page, right-click, and pick **“AI Translate (E2B)”**.
+A tooltip appears showing:
 
 1. **Bengali** translation first (with phonetic transliteration), then
 2. **English meaning** (and part of speech for single words), then
@@ -12,7 +12,7 @@ or **“H2R - Lookup”**. A tooltip appears showing:
 
 ## Features
 
-- Right-click context menu **“H2R - Translate”** and **“H2R - Lookup”** on any text selection.
+- Single right-click context menu item **“AI Translate (E2B)”** on any text selection.
 - Results render inline in a clean tooltip anchored to the selection (no page navigation).
 - Pluggable AI provider — Gemini, ChatGPT (OpenAI), or Claude (Anthropic).
 - API key and provider configured in the extension settings after install.
@@ -26,11 +26,11 @@ or **“H2R - Lookup”**. A tooltip appears showing:
 3. Open `chrome://extensions` in Chrome (or any Chromium browser).
 4. Toggle **Developer mode** on (top-right).
 5. Click **Load unpacked** and select this project folder.
-6. The **H2R - Translate** icon appears in the toolbar.
+6. The **AI Translate** icon appears in the toolbar.
 
 ## Configure your API key
 
-1. Click the **H2R - Translate** toolbar icon → **Open settings** (or right-click the
+1. Click the **AI Translate** toolbar icon → **Open settings** (or right-click the
    icon → Options).
 2. Choose your **AI provider**.
 3. Paste your **API key**:
@@ -48,7 +48,7 @@ or **“H2R - Lookup”**. A tooltip appears showing:
 ## Usage
 
 1. Highlight an English word or sentence on any page.
-2. Right-click → **H2R - Translate** (full translation) or **H2R - Lookup** (dictionary-style).
+2. Right-click → **AI Translate (E2B)**.
 3. Read the Bengali translation, English meaning, and examples in the tooltip.
 4. Press **Esc** or click outside the tooltip to dismiss it.
 
@@ -103,6 +103,14 @@ curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:g
 
 A working key returns a JSON response with `candidates`; a broken key returns the
 401 `UNAUTHENTICATED` error.
+
+## Publishing to the Chrome Web Store
+
+Run `./package.sh` to build a clean upload ZIP at
+`dist/ai-translate-english-to-bangla-v<version>.zip`, then follow
+[`PUBLISHING.md`](PUBLISHING.md) for the full submission steps. The
+extension's privacy policy is in [`PRIVACY.md`](PRIVACY.md) (host it publicly and
+provide the URL in the store listing).
 
 ## Notes
 
