@@ -159,9 +159,24 @@ async function parseRes(res, name) {
   }
   if (!res.ok) {
     const msg = data?.error?.message || data?.error || data?.message || `HTTP ${res.status}`;
+    let reason = "";
+    const details = data?.error?.details;
+    if (Array.isArray(details)) {
+      for (const d of details) {
+        if (d && d.reason) {
+          reason = d.reason;
+          break;
+        }
+      }
+    }
     let hint = "";
     if ((res.status === 401 || res.status === 403) && name === "Gemini") {
-      hint = " — Use a Gemini API key from Google AI Studio (Get API key), not an OAuth/Cloud credential.";
+      if (reason === "ACCESS_TOKEN_TYPE_UNSUPPORTED") {
+        hint =
+          " — This 'AQ.' auth key is not bound to a service account with the Generative Language API enabled. Create a working key at aistudio.google.com/apikey, or a standard key in Google Cloud Console restricted to the Generative Language API.";
+      } else {
+        hint = " — Use a Gemini API key from Google AI Studio (Get API key), not an OAuth/Cloud credential.";
+      }
     }
     throw new Error(`${name}: ${msg}${hint}`);
   }
