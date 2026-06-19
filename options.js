@@ -99,10 +99,13 @@ async function runTest(provider, apiKey, model) {
   if (provider === "gemini") {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
       model
-    )}:generateContent?key=${encodeURIComponent(apiKey)}`;
+    )}:generateContent`;
     const res = await fetch(url, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: {
+        "Content-Type": "application/json",
+        "x-goog-api-key": apiKey,
+      },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] }),
     });
     const data = await parseRes(res, "Gemini");
