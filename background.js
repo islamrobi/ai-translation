@@ -6,7 +6,7 @@ const MENU_TRANSLATE = "h2r-translate";
 const MENU_LOOKUP = "h2r-lookup";
 
 const DEFAULT_MODELS = {
-  gemini: "gemini-2.0-flash",
+  gemini: "gemini-3.5-flash",
   openai: "gpt-4o-mini",
   claude: "claude-3-5-haiku-latest",
 };
@@ -26,7 +26,23 @@ function buildContextMenus() {
   });
 }
 
-chrome.runtime.onInstalled.addListener(buildContextMenus);
+// Models that Google has retired; clear them so the current default is used.
+const DEPRECATED_GEMINI_MODELS = ["gemini-2.0-flash", "gemini-1.5-flash", "gemini-1.5-pro"];
+
+function migrateSettings() {
+  chrome.storage.sync.get({ provider: "gemini", model: "" }, (items) => {
+    const model = (items.model || "").trim();
+    if (items.provider === "gemini" && DEPRECATED_GEMINI_MODELS.includes(model)) {
+      // Reset to blank so getSettings() falls back to the current default model.
+      chrome.storage.sync.set({ model: "" });
+    }
+  });
+}
+
+chrome.runtime.onInstalled.addListener(() => {
+  buildContextMenus();
+  migrateSettings();
+});
 chrome.runtime.onStartup.addListener(buildContextMenus);
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
@@ -185,8 +201,9 @@ async function callGemini(prompt, settings) {
 
   const body = {
     contents: [{ parts: [{ text: prompt }] }],
+    // Gemini 3.x recommends keeping temperature at its default; only request a
+    // JSON response so parsing stays reliable.
     generationConfig: {
-      temperature: 0.2,
       responseMimeType: "application/json",
     },
   };
