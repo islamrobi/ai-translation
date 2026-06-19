@@ -121,10 +121,10 @@ In the console's **Privacy practices** tab:
 
 ## 7. Notes that affect review
 
-- This extension requests access to all sites (`<all_urls>` for the content
-  script) so it can show the tooltip anywhere. Broad host access can lengthen
-  review; the single-purpose description and permission justifications above are
-  written to address it.
+- This extension does **not** request broad host permissions. The tooltip code
+  is injected on demand with `chrome.scripting` using the `activeTab` permission,
+  which is granted only when the user invokes the extension via the right-click
+  menu. The only host permissions are the three specific AI provider API domains.
 - Keep the published privacy policy URL live; a dead link can cause removal.
 - For each future update: bump `manifest.json` `version`, run `./package.sh`,
   upload the new ZIP, and resubmit.
