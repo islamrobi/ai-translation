@@ -6,7 +6,7 @@ const MENU_TRANSLATE = "h2r-translate";
 const MENU_LOOKUP = "h2r-lookup";
 
 const DEFAULT_MODELS = {
-  gemini: "gemini-3.5-flash",
+  gemini: "gemini-2.5-flash-lite",
   openai: "gpt-4o-mini",
   claude: "claude-3-5-haiku-latest",
 };

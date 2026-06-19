@@ -40,7 +40,7 @@ or **“H2R - Lookup”**. A tooltip appears showing:
 4. (Optional) Set a specific **model**. Leave blank to use the recommended default:
    | Provider | Default model |
    | --- | --- |
-   | Gemini | `gemini-3.5-flash` |
+   | Gemini | `gemini-2.5-flash-lite` (cheapest; free tier available) |
    | OpenAI | `gpt-4o-mini` |
    | Claude | `claude-3-5-haiku-latest` |
 5. Click **Save settings**. Use **Test connection** to confirm it works.
