@@ -22,8 +22,8 @@ API key. This policy explains what data the extension handles and how.
    sessions and, if you are signed in to the browser, syncs to your own account.
    It is used solely to authenticate your requests to that provider.
 
-2. **Selected text.** When you select text and choose "AI Translate (E2B)" →
-   "Translate" or "Lookup", the selected text is sent to the AI provider you configured in
+2. **Selected text.** When you select text and choose "AI Translate (E2B)",
+   the selected text is sent to the AI provider you configured in
    order to generate the translation, meaning, and examples shown in the tooltip.
 
 3. **Settings.** Your chosen provider and optional model name are stored the same
@@ -53,8 +53,7 @@ Please review the policy of the provider you choose.
 
 The extension requests only the permissions required to function:
 
-- `contextMenus` — to add the "AI Translate (E2B)" right-click menu with its
-  "Translate" / "Lookup" options.
+- `contextMenus` — to add the "AI Translate (E2B)" right-click menu item.
 - `storage` — to save your provider, API key, and model preferences.
 - `scripting` and `activeTab` — to display the result tooltip on the current page,
   including pages that were already open before the extension was installed.

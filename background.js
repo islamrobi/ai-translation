@@ -2,9 +2,7 @@
 // Creates context menus, calls the configured AI provider, and pushes the
 // result down to the content script which renders it inside a tooltip.
 
-const MENU_PARENT = "h2r-parent";
 const MENU_TRANSLATE = "h2r-translate";
-const MENU_LOOKUP = "h2r-lookup";
 
 const DEFAULT_MODELS = {
   gemini: "gemini-2.5-flash-lite",
@@ -15,20 +13,8 @@ const DEFAULT_MODELS = {
 function buildContextMenus() {
   chrome.contextMenus.removeAll(() => {
     chrome.contextMenus.create({
-      id: MENU_PARENT,
-      title: "AI Translate (E2B)",
-      contexts: ["selection"],
-    });
-    chrome.contextMenus.create({
       id: MENU_TRANSLATE,
-      parentId: MENU_PARENT,
-      title: "Translate",
-      contexts: ["selection"],
-    });
-    chrome.contextMenus.create({
-      id: MENU_LOOKUP,
-      parentId: MENU_PARENT,
-      title: "Lookup",
+      title: "AI Translate (E2B)",
       contexts: ["selection"],
     });
   });
@@ -55,11 +41,11 @@ chrome.runtime.onStartup.addListener(buildContextMenus);
 
 chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (!tab || tab.id == null) return;
+  if (info.menuItemId !== MENU_TRANSLATE) return;
   const text = (info.selectionText || "").trim();
   if (!text) return;
 
-  const mode = info.menuItemId === MENU_LOOKUP ? "lookup" : "translate";
-  handleRequest(tab.id, text, mode);
+  handleRequest(tab.id, text, "translate");
 });
 
 // Allow the content script (e.g. a re-try button) to ask for a translation too.

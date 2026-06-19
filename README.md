@@ -3,8 +3,8 @@
 A Chrome (Manifest V3) extension that translates **English → Bengali (Bangla)** using an AI
 model of your choice (Google Gemini, OpenAI / ChatGPT, or Anthropic Claude).
 
-Select any word or sentence on a web page, right-click, and pick **“AI Translate (E2B)”**
-→ **“Translate”** or **“Lookup”**. A tooltip appears showing:
+Select any word or sentence on a web page, right-click, and pick **“AI Translate (E2B)”**.
+A tooltip appears showing:
 
 1. **Bengali** translation first (with phonetic transliteration), then
 2. **English meaning** (and part of speech for single words), then
@@ -12,7 +12,7 @@ Select any word or sentence on a web page, right-click, and pick **“AI Transla
 
 ## Features
 
-- Right-click context menu **“AI Translate (E2B)”** with **“Translate”** and **“Lookup”** options on any text selection.
+- Single right-click context menu item **“AI Translate (E2B)”** on any text selection.
 - Results render inline in a clean tooltip anchored to the selection (no page navigation).
 - Pluggable AI provider — Gemini, ChatGPT (OpenAI), or Claude (Anthropic).
 - API key and provider configured in the extension settings after install.
@@ -48,7 +48,7 @@ Select any word or sentence on a web page, right-click, and pick **“AI Transla
 ## Usage
 
 1. Highlight an English word or sentence on any page.
-2. Right-click → **AI Translate (E2B)** → **Translate** (full translation) or **Lookup** (dictionary-style).
+2. Right-click → **AI Translate (E2B)**.
 3. Read the Bengali translation, English meaning, and examples in the tooltip.
 4. Press **Esc** or click outside the tooltip to dismiss it.
 
