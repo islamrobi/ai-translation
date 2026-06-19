@@ -76,6 +76,7 @@ repository with a new "Last updated" date.
 For questions about this policy or the extension, contact:
 
 - **Robiul Islam Robi**
+- Organization: hello2robi.com
 - Email: hello2robi@gmail.com
 
 You can also open an issue in the extension's source repository.

@@ -1,8 +1,9 @@
 # Publishing AI Translate - English to Bangla to the Chrome Web Store
 
 > **Publisher / contact:** Robiul Islam Robi — hello2robi@gmail.com
-> Use this name and email for the developer account, the listing's support
-> contact, and the privacy policy contact.
+> **Organization:** hello2robi.com
+> Use this name, organization, and email for the developer account, the listing's
+> support contact, and the privacy policy contact.
 
 
 This guide walks through submitting the extension to the Chrome Web Store. The
