@@ -99,7 +99,7 @@ async function runTest(provider, apiKey, model) {
   if (provider === "gemini") {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(
       model
-    )}:generateContent`;
+    )}:generateContent?key=${encodeURIComponent(apiKey)}`;
     const res = await fetch(url, {
       method: "POST",
       headers: {
@@ -159,7 +159,11 @@ async function parseRes(res, name) {
   }
   if (!res.ok) {
     const msg = data?.error?.message || data?.error || data?.message || `HTTP ${res.status}`;
-    throw new Error(`${name}: ${msg}`);
+    let hint = "";
+    if ((res.status === 401 || res.status === 403) && name === "Gemini") {
+      hint = " — Use a Gemini API key from Google AI Studio (Get API key), not an OAuth/Cloud credential.";
+    }
+    throw new Error(`${name}: ${msg}${hint}`);
   }
   return data;
 }
