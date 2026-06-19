@@ -40,8 +40,8 @@ or **“H2R - Lookup”**. A tooltip appears showing:
 4. (Optional) Set a specific **model**. Leave blank to use the recommended default:
    | Provider | Default model |
    | --- | --- |
-   | Gemini | `gemini-3.5-flash` |
-   | OpenAI | `gpt-4o-mini` |
+   | Gemini | `gemini-2.5-flash-lite` (cheapest; free tier available) |
+   | OpenAI | `gpt-5-nano` (cheapest; no free tier) |
    | Claude | `claude-3-5-haiku-latest` |
 5. Click **Save settings**. Use **Test connection** to confirm it works.
 
@@ -70,6 +70,39 @@ popup.html/.js    Toolbar popup with status + settings shortcut
 icons/            Generated PNG icons (16/32/48/128)
 gen_icons.py      Stdlib-only icon generator
 ```
+
+## Troubleshooting
+
+### Gemini: "Request had invalid authentication credentials … Expected OAuth 2 access token" (HTTP 401)
+
+This is returned by Google, not the extension, and means the API key was rejected.
+The structured reason is usually `ACCESS_TOKEN_TYPE_UNSUPPORTED`.
+
+Google now issues **auth keys** (they start with `AQ.`) instead of the legacy
+standard keys (`AIza…`). An `AQ.` key only works when it is **bound to a Google
+Cloud service account that has the Generative Language API enabled**. If that
+binding did not complete (often due to missing IAM permissions when the key was
+created), the key is issued but every request fails with the error above.
+
+To fix it, create a working key one of these ways:
+
+1. **AI Studio (recommended):** go to <https://aistudio.google.com/apikey> and
+   create a key in a project where you have permission to create the linked
+   service account. Then test it (see below).
+2. **Google Cloud Console (legacy standard key):** create an API key, then
+   restrict it to the **Generative Language API**. Restricted standard keys
+   continue to work.
+
+Verify any key from a terminal before pasting it into the extension:
+
+```bash
+curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-3.5-flash:generateContent" \
+  -H "x-goog-api-key: YOUR_KEY" -H "Content-Type: application/json" \
+  -X POST -d '{"contents":[{"parts":[{"text":"translate hello to bengali"}]}]}'
+```
+
+A working key returns a JSON response with `candidates`; a broken key returns the
+401 `UNAUTHENTICATED` error.
 
 ## Notes
 

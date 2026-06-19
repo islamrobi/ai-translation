@@ -1,16 +1,16 @@
 // H2R - Translate :: options/settings page logic.
 
 const DEFAULT_MODELS = {
-  gemini: "gemini-3.5-flash",
-  openai: "gpt-4o-mini",
+  gemini: "gemini-2.5-flash-lite",
+  openai: "gpt-5-nano",
   claude: "claude-3-5-haiku-latest",
 };
 
 const PROVIDER_HINTS = {
   gemini:
-    'Create a free key at Google AI Studio (aistudio.google.com). Default model: "gemini-3.5-flash".',
+    'Create a free key at Google AI Studio (aistudio.google.com). Default model: "gemini-2.5-flash-lite" (cheapest; has a free tier).',
   openai:
-    'Create a key at platform.openai.com → API keys. Default model: "gpt-4o-mini".',
+    'Create a key at platform.openai.com → API keys (no free tier). Default model: "gpt-5-nano" (cheapest).',
   claude:
     'Create a key at console.anthropic.com → API keys. Default model: "claude-3-5-haiku-latest".',
 };
@@ -159,9 +159,24 @@ async function parseRes(res, name) {
   }
   if (!res.ok) {
     const msg = data?.error?.message || data?.error || data?.message || `HTTP ${res.status}`;
+    let reason = "";
+    const details = data?.error?.details;
+    if (Array.isArray(details)) {
+      for (const d of details) {
+        if (d && d.reason) {
+          reason = d.reason;
+          break;
+        }
+      }
+    }
     let hint = "";
     if ((res.status === 401 || res.status === 403) && name === "Gemini") {
-      hint = " — Use a Gemini API key from Google AI Studio (Get API key), not an OAuth/Cloud credential.";
+      if (reason === "ACCESS_TOKEN_TYPE_UNSUPPORTED") {
+        hint =
+          " — This 'AQ.' auth key is not bound to a service account with the Generative Language API enabled. Create a working key at aistudio.google.com/apikey, or a standard key in Google Cloud Console restricted to the Generative Language API.";
+      } else {
+        hint = " — Use a Gemini API key from Google AI Studio (Get API key), not an OAuth/Cloud credential.";
+      }
     }
     throw new Error(`${name}: ${msg}${hint}`);
   }

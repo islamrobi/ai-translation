@@ -6,8 +6,8 @@ const MENU_TRANSLATE = "h2r-translate";
 const MENU_LOOKUP = "h2r-lookup";
 
 const DEFAULT_MODELS = {
-  gemini: "gemini-3.5-flash",
-  openai: "gpt-4o-mini",
+  gemini: "gemini-2.5-flash-lite",
+  openai: "gpt-5-nano",
   claude: "claude-3-5-haiku-latest",
 };
 
@@ -66,6 +66,11 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 async function handleRequest(tabId, text, mode) {
+  // Make sure the tooltip code is present in this tab. Tabs that were already
+  // open when the extension was installed/reloaded won't have the content
+  // script, so inject it on demand before sending any messages.
+  await ensureContentScript(tabId);
+
   sendToTab(tabId, { type: "h2r-loading", text, mode });
 
   try {
@@ -97,6 +102,24 @@ function sendToTab(tabId, payload) {
   chrome.tabs.sendMessage(tabId, payload).catch(() => {
     // Content script may not be injected on this page (e.g. chrome:// pages).
   });
+}
+
+async function ensureContentScript(tabId) {
+  // If the content script is already running it will answer a ping.
+  try {
+    await chrome.tabs.sendMessage(tabId, { type: "h2r-ping" });
+    return true;
+  } catch (e) {
+    // Not injected yet — fall through and inject it.
+  }
+  try {
+    await chrome.scripting.insertCSS({ target: { tabId }, files: ["content.css"] });
+    await chrome.scripting.executeScript({ target: { tabId }, files: ["content.js"] });
+    return true;
+  } catch (e) {
+    // Restricted page (chrome://, Web Store, PDF viewer, etc.) — cannot inject.
+    return false;
+  }
 }
 
 function getSettings() {
@@ -280,6 +303,18 @@ async function callClaude(prompt, settings) {
   return textOut;
 }
 
+// Pull the structured machine reason (e.g. ACCESS_TOKEN_TYPE_UNSUPPORTED) out of
+// a Google API error payload so we can give a precise hint.
+function extractErrorReason(data) {
+  const details = data?.error?.details;
+  if (Array.isArray(details)) {
+    for (const d of details) {
+      if (d && d.reason) return d.reason;
+    }
+  }
+  return data?.error?.status || "";
+}
+
 async function readJsonOrThrow(res, providerName) {
   let data;
   try {
@@ -293,11 +328,17 @@ async function readJsonOrThrow(res, providerName) {
   if (!res.ok) {
     const apiMsg =
       data?.error?.message || data?.error || data?.message || `HTTP ${res.status}`;
+    const reason = extractErrorReason(data);
     let hint = "";
     if (res.status === 401 || res.status === 403) {
       if (providerName === "Gemini") {
-        hint =
-          " — Make sure you pasted a Gemini API key from Google AI Studio (aistudio.google.com → 'Get API key'), not a Google Cloud OAuth client ID or a service-account credential. Also confirm the 'Generative Language API' is enabled and the key has no HTTP-referrer/IP restrictions.";
+        if (reason === "ACCESS_TOKEN_TYPE_UNSUPPORTED") {
+          hint =
+            " — Google rejected this key (ACCESS_TOKEN_TYPE_UNSUPPORTED). New 'AQ.' auth keys only work when they are bound to a service account that has the Generative Language API enabled; this one is not. Fix: create a key on the AI Studio API keys page (https://aistudio.google.com/apikey) using a project where you have permission to create the linked service account, OR create a standard key in Google Cloud Console and restrict it to the 'Generative Language API'. Then update it in the H2R settings.";
+        } else {
+          hint =
+            " — Make sure you pasted a Gemini API key from Google AI Studio (https://aistudio.google.com/apikey), not a Google Cloud OAuth client ID or a service-account credential. Also confirm the 'Generative Language API' is enabled and the key has no HTTP-referrer/IP restrictions.";
+        }
       } else {
         hint = " — Check that the API key is correct and has not expired or been restricted.";
       }
