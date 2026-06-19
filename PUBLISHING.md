@@ -43,7 +43,7 @@ The Web Store requires a few images. You provide:
   tooltip in action:
   1. Load the unpacked extension (see the README), add a working API key.
   2. Open a normal web page, select an English word/sentence, right-click →
-     "H2R - Translate".
+     "AI Translate (E2B)" → "Translate".
   3. Screenshot the page with the tooltip visible. Crop/resize to 1280×800.
   4. Recommended: 2–4 screenshots (translate result, lookup result, the settings
      page).
@@ -61,8 +61,8 @@ In the developer console, create a new item, upload the ZIP, then complete:
   ```
   AI Translate - English to Bangla turns any web page into an English→Bangla learning tool.
 
-  Select a word or sentence, right-click, and choose "H2R - Translate" or
-  "H2R - Lookup". A tooltip instantly shows:
+  Select a word or sentence, right-click, and choose "AI Translate (E2B)" →
+  "Translate" or "Lookup". A tooltip instantly shows:
     • the Bengali translation (with phonetic transliteration),
     • the English meaning (and part of speech for single words), and
     • example sentences in both English and Bengali.
@@ -73,7 +73,7 @@ In the developer console, create a new item, upload the ZIP, then complete:
   directly to the provider you pick; there is no middle-man server.
 
   Features
-    • Right-click "H2R - Translate" and "H2R - Lookup" on any selection
+    • Right-click "AI Translate (E2B)" → "Translate" or "Lookup" on any selection
     • Clean, light/dark-aware tooltip with a Bengali font stack
     • Pluggable AI provider with a built-in "Test connection" button
     • No tracking, no analytics, no data collection

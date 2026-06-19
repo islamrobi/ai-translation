@@ -88,7 +88,7 @@ async function handleRequest(tabId, text, mode) {
         type: "h2r-error",
         text,
         mode,
-        error: "No API key configured. Open the H2R - Translate settings to add one.",
+        error: "No API key configured. Open the AI Translate settings to add one.",
         needsSettings: true,
       });
       return;
