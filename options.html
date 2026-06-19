@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>H2R - Translate · Settings</title>
+    <link rel="stylesheet" href="options.css" />
+  </head>
+  <body>
+    <main class="card">
+      <header class="hero">
+        <div class="logo">H2R</div>
+        <div>
+          <h1>H2R - Translate</h1>
+          <p class="subtitle">English → Bengali translation in your browser, powered by AI.</p>
+        </div>
+      </header>
+
+      <form id="settings-form">
+        <section class="field">
+          <label for="provider">AI provider</label>
+          <select id="provider" name="provider">
+            <option value="gemini">Google Gemini</option>
+            <option value="openai">OpenAI (ChatGPT)</option>
+            <option value="claude">Anthropic Claude</option>
+          </select>
+          <p class="hint" id="provider-hint"></p>
+        </section>
+
+        <section class="field">
+          <label for="apiKey">API key</label>
+          <div class="key-row">
+            <input
+              type="password"
+              id="apiKey"
+              name="apiKey"
+              placeholder="Paste your API key here"
+              autocomplete="off"
+              spellcheck="false"
+            />
+            <button type="button" id="toggle-key" class="ghost">Show</button>
+          </div>
+          <p class="hint">
+            Your key is stored only in your browser using Chrome's extension storage and is sent
+            directly to the provider you select. It is never shared with anyone else.
+          </p>
+        </section>
+
+        <section class="field">
+          <label for="model">Model <span class="optional">(optional)</span></label>
+          <input
+            type="text"
+            id="model"
+            name="model"
+            placeholder=""
+            autocomplete="off"
+            spellcheck="false"
+          />
+          <p class="hint">Leave blank to use the recommended default for the selected provider.</p>
+        </section>
+
+        <div class="actions">
+          <button type="submit" id="save" class="primary">Save settings</button>
+          <button type="button" id="test" class="secondary">Test connection</button>
+          <span id="status" class="status" role="status"></span>
+        </div>
+      </form>
+
+      <section class="usage">
+        <h2>How to use</h2>
+        <ol>
+          <li>Select any English word or sentence on a web page.</li>
+          <li>Right-click and choose <strong>“H2R - Translate”</strong> (or <strong>“H2R - Lookup”</strong>).</li>
+          <li>A tooltip shows the Bengali translation, the English meaning, and example usage.</li>
+        </ol>
+      </section>
+    </main>
+
+    <script src="options.js"></script>
+  </body>
+</html>
